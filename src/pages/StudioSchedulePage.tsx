@@ -10,11 +10,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import scheduleData from "@/mock/studio-schedule.json";
-import type { Room, ScheduleSlot, StudioScheduleData } from "@/types/schedule";
+import type {
+  Room,
+  ScheduleSlot,
+  StudioScheduleData,
+  WeeklyOccupancyStats,
+} from "@/types/schedule";
 import {
   TIME_SLOTS,
   addWeeks,
   buildSlotMap,
+  calculateWeeklyOccupancy,
   formatDayHeader,
   formatWeekLabel,
   getMockBaseWeek,
@@ -38,6 +44,10 @@ export function StudioSchedulePage() {
 
   const weekDays = useMemo(() => getWeekDays(weekAnchor), [weekAnchor]);
   const slotMap = useMemo(() => buildSlotMap(slots), [slots]);
+  const stats = useMemo(
+    () => calculateWeeklyOccupancy(slots, rooms, weekAnchor),
+    [slots, rooms, weekAnchor]
+  );
 
   const handlePrevWeek = () => setWeekAnchor((d) => subWeeks(d, 1));
   const handleNextWeek = () => setWeekAnchor((d) => addWeeks(d, 1));
@@ -94,6 +104,8 @@ export function StudioSchedulePage() {
             </Button>
           </div>
         </header>
+
+        <WeeklyStatsCards stats={stats} />
 
         <div className="space-y-6">
           {weekDays.map((day) => (
@@ -249,6 +261,71 @@ function TimeSlotRow({
         );
       })}
     </>
+  );
+}
+
+interface WeeklyStatsCardsProps {
+  stats: WeeklyOccupancyStats;
+}
+
+function WeeklyStatsCards({ stats }: WeeklyStatsCardsProps) {
+  return (
+    <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <StatCard
+        label="本周总预约"
+        value={stats.totalBookings}
+        unit="场次"
+        variant="primary"
+      />
+      <StatCard
+        label="总占用时段"
+        value={stats.totalOccupiedSlots}
+        unit="时段"
+        variant="default"
+      />
+      {stats.roomStats.map((roomStat) => (
+        <StatCard
+          key={roomStat.roomId}
+          label={roomStat.roomName}
+          value={roomStat.occupiedSlots}
+          unit="时段"
+          variant="default"
+        />
+      ))}
+    </section>
+  );
+}
+
+interface StatCardProps {
+  label: string;
+  value: number;
+  unit: string;
+  variant?: "default" | "primary";
+}
+
+function StatCard({ label, value, unit, variant = "default" }: StatCardProps) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg border p-4 shadow-sm",
+        variant === "primary"
+          ? "border-primary/30 bg-primary/5"
+          : "border-border bg-card"
+      )}
+    >
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <p className="mt-2 flex items-baseline gap-1">
+        <span
+          className={cn(
+            "text-2xl font-bold",
+            variant === "primary" ? "text-primary" : "text-foreground"
+          )}
+        >
+          {value}
+        </span>
+        <span className="text-xs text-muted-foreground">{unit}</span>
+      </p>
+    </div>
   );
 }
 

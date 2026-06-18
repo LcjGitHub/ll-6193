@@ -8,7 +8,14 @@ import {
   subWeeks,
 } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import type { CellKey, ScheduleSlot, TimeSlotRow } from "@/types/schedule";
+import type {
+  CellKey,
+  Room,
+  ScheduleSlot,
+  TimeSlotRow,
+  WeeklyOccupancyStats,
+  RoomOccupancyStat,
+} from "@/types/schedule";
 
 /** 每日营业时段（09:00–17:00，每小时一格） */
 export const TIME_SLOTS: TimeSlotRow[] = [
@@ -123,3 +130,48 @@ export function getMockBaseWeek(slots: ScheduleSlot[]): Date {
 }
 
 export { addWeeks, subWeeks };
+
+function countOccupiedSlotsForSlot(slot: ScheduleSlot): number {
+  const startIdx = TIME_SLOTS.findIndex((t) => t.startTime === slot.startTime);
+  const endIdx = TIME_SLOTS.findIndex((t) => t.endTime === slot.endTime);
+  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return 0;
+  return endIdx - startIdx + 1;
+}
+
+export function calculateWeeklyOccupancy(
+  slots: ScheduleSlot[],
+  rooms: Room[],
+  weekAnchor: Date
+): WeeklyOccupancyStats {
+  const weekDays = getWeekDays(weekAnchor);
+  const weekDateKeys = weekDays.map((d) => toDateKey(d));
+
+  const weekSlots = slots.filter((slot) => weekDateKeys.includes(slot.date));
+
+  const totalBookings = weekSlots.length;
+
+  const roomStatMap = new Map<string, RoomOccupancyStat>();
+  for (const room of rooms) {
+    roomStatMap.set(room.id, {
+      roomId: room.id,
+      roomName: room.name,
+      occupiedSlots: 0,
+    });
+  }
+
+  let totalOccupiedSlots = 0;
+  for (const slot of weekSlots) {
+    const slotCount = countOccupiedSlotsForSlot(slot);
+    totalOccupiedSlots += slotCount;
+    const stat = roomStatMap.get(slot.roomId);
+    if (stat) {
+      stat.occupiedSlots += slotCount;
+    }
+  }
+
+  return {
+    totalBookings,
+    totalOccupiedSlots,
+    roomStats: Array.from(roomStatMap.values()),
+  };
+}

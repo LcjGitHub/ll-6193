@@ -29,3 +29,15 @@ export interface CellKey {
   roomId: string;
   startTime: string;
 }
+
+export interface RoomOccupancyStat {
+  roomId: string;
+  roomName: string;
+  occupiedSlots: number;
+}
+
+export interface WeeklyOccupancyStats {
+  totalBookings: number;
+  totalOccupiedSlots: number;
+  roomStats: RoomOccupancyStat[];
+}
