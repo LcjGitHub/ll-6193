@@ -12,6 +12,7 @@ export interface ScheduleSlot {
   endTime: string;
   bookedBy: string;
   projectName: string;
+  phone?: string;
 }
 
 export interface StudioScheduleData {
@@ -40,4 +41,17 @@ export interface WeeklyOccupancyStats {
   totalBookings: number;
   totalOccupiedSlots: number;
   roomStats: RoomOccupancyStat[];
+}
+
+export interface ApplicationFormData {
+  bookedBy: string;
+  projectName: string;
+  phone: string;
+}
+
+export interface PendingCell {
+  date: string;
+  roomId: string;
+  startTime: string;
+  endTime: string;
 }

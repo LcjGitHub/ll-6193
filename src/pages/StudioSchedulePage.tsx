@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { ApplicationDialog } from "@/components/ApplicationDialog";
 import { SearchInput } from "@/components/SearchInput";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import scheduleData from "@/mock/studio-schedule.json";
 import type {
+  ApplicationFormData,
+  PendingCell,
   Room,
   ScheduleSlot,
   StudioScheduleData,
@@ -20,6 +23,7 @@ import type {
 import {
   TIME_SLOTS,
   addWeeks,
+  buildCellKey,
   buildSlotMap,
   calculateWeeklyOccupancy,
   filterSlotsByKeyword,
@@ -39,23 +43,27 @@ const data = scheduleData as StudioScheduleData;
  * 录音棚周视图排期页面。
  */
 export function StudioSchedulePage() {
-  const { rooms, slots } = data;
-  const baseWeek = useMemo(() => getMockBaseWeek(slots), [slots]);
+  const { rooms, slots: mockSlots } = data;
+  const baseWeek = useMemo(() => getMockBaseWeek(mockSlots), [mockSlots]);
   const [weekAnchor, setWeekAnchor] = useState(baseWeek);
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [localSlots, setLocalSlots] = useState<ScheduleSlot[]>([]);
+  const [pendingCell, setPendingCell] = useState<PendingCell | null>(null);
+
+  const allSlots = useMemo(() => [...mockSlots, ...localSlots], [mockSlots, localSlots]);
 
   const weekDays = useMemo(() => getWeekDays(weekAnchor), [weekAnchor]);
-  const slotMap = useMemo(() => buildSlotMap(slots), [slots]);
+  const slotMap = useMemo(() => buildSlotMap(allSlots), [allSlots]);
   const stats = useMemo(
-    () => calculateWeeklyOccupancy(slots, rooms, weekAnchor),
-    [slots, rooms, weekAnchor]
+    () => calculateWeeklyOccupancy(allSlots, rooms, weekAnchor),
+    [allSlots, rooms, weekAnchor]
   );
 
   const isSearching = searchKeyword.trim().length > 0;
   const filteredSlots = useMemo(
-    () => filterSlotsByKeyword(slots, searchKeyword),
-    [slots, searchKeyword]
+    () => filterSlotsByKeyword(allSlots, searchKeyword),
+    [allSlots, searchKeyword]
   );
   const filteredSlotMap = useMemo(
     () => buildSlotMap(filteredSlots),
@@ -72,17 +80,47 @@ export function StudioSchedulePage() {
   const handlePrevWeek = () => setWeekAnchor((d) => subWeeks(d, 1));
   const handleNextWeek = () => setWeekAnchor((d) => addWeeks(d, 1));
 
-  const handleCellClick = (
-    date: string,
-    roomId: string,
-    startTime: string
-  ) => {
-    const slot = slotMap.get(`${date}|${roomId}|${startTime}`);
-    if (slot) setSelectedSlot(slot);
-  };
+  const handleCellClick = useCallback(
+    (date: string, roomId: string, startTime: string) => {
+      const key = buildCellKey(date, roomId, startTime);
+      const slot = slotMap.get(key);
+      if (slot) {
+        setSelectedSlot(slot);
+        return;
+      }
+      const ts = TIME_SLOTS.find((t) => t.startTime === startTime);
+      setPendingCell({
+        date,
+        roomId,
+        startTime,
+        endTime: ts ? ts.endTime : startTime,
+      });
+    },
+    [slotMap]
+  );
 
-  const roomName = selectedSlot
+  const handleApplicationSubmit = useCallback(
+    (cell: PendingCell, formData: ApplicationFormData) => {
+      const newSlot: ScheduleSlot = {
+        id: `local-${Date.now()}`,
+        roomId: cell.roomId,
+        date: cell.date,
+        startTime: cell.startTime,
+        endTime: cell.endTime,
+        bookedBy: formData.bookedBy,
+        projectName: formData.projectName,
+        phone: formData.phone,
+      };
+      setLocalSlots((prev) => [...prev, newSlot]);
+    },
+    []
+  );
+
+  const selectedRoomName = selectedSlot
     ? rooms.find((r) => r.id === selectedSlot.roomId)?.name
+    : undefined;
+  const pendingRoomName = pendingCell
+    ? rooms.find((r) => r.id === pendingCell.roomId)?.name
     : undefined;
 
   return (
@@ -93,7 +131,7 @@ export function StudioSchedulePage() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight">录音棚场次排期</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                3 房间 × 周视图 · 点击已占用时段查看详情
+                3 房间 × 周视图 · 点击空闲时段可申请，点击已占用时段查看详情
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -160,11 +198,15 @@ export function StudioSchedulePage() {
         <div className="mt-6 flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-3 rounded-sm border bg-muted/40" />
-            空闲
+            空闲（点击申请）
           </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-3 rounded-sm border bg-primary/20 border-primary/40" />
-            已占用（可点击）
+            已占用（点击查看）
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-3 w-3 rounded-sm border bg-emerald-100 border-emerald-300" />
+            本地申请
           </span>
           {isSearching && (
             <span className="flex items-center gap-1.5">
@@ -177,11 +219,21 @@ export function StudioSchedulePage() {
 
       <BookingDialog
         slot={selectedSlot}
-        roomName={roomName}
+        roomName={selectedRoomName}
         open={selectedSlot !== null}
         onOpenChange={(open) => {
           if (!open) setSelectedSlot(null);
         }}
+      />
+
+      <ApplicationDialog
+        cell={pendingCell}
+        roomName={pendingRoomName}
+        open={pendingCell !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingCell(null);
+        }}
+        onSubmit={handleApplicationSubmit}
       />
     </div>
   );
@@ -290,18 +342,26 @@ function TimeSlotRow({
         <span className="text-muted-foreground/60"> – {timeSlot.endTime}</span>
       </div>
       {rooms.map((room, idx) => {
-        const occupied = isSlotOccupied(
-          slotMap,
-          dateKey,
-          room.id,
-          timeSlot.startTime
-        );
-        const slot = slotMap.get(`${dateKey}|${room.id}|${timeSlot.startTime}`);
-        const isMatch = filteredSlotMap.has(
-          `${dateKey}|${room.id}|${timeSlot.startTime}`
-        );
+        const key = buildCellKey(dateKey, room.id, timeSlot.startTime);
+        const occupied = slotMap.has(key);
+        const slot = slotMap.get(key);
+        const isLocal = slot ? slot.id.startsWith("local-") : false;
+        const isMatch = filteredSlotMap.has(key);
 
-        if (isSearching && !isMatch) {
+        if (isSearching && !isMatch && occupied) {
+          return (
+            <div
+              key={room.id}
+              className={cn(
+                "min-h-[44px] bg-primary/5",
+                !isLastRow && "border-b",
+                idx < rooms.length - 1 && "border-r"
+              )}
+            />
+          );
+        }
+
+        if (isSearching && !isMatch && !occupied) {
           return (
             <div
               key={room.id}
@@ -318,29 +378,34 @@ function TimeSlotRow({
           <button
             key={room.id}
             type="button"
-            disabled={!occupied}
             onClick={() => onCellClick(dateKey, room.id, timeSlot.startTime)}
             className={cn(
-              "min-h-[44px] p-1 text-left transition-colors",
+              "min-h-[44px] p-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               !isLastRow && "border-b",
               idx < rooms.length - 1 && "border-r",
               occupied
-                ? isSearching && isMatch
-                  ? "cursor-pointer bg-amber-200 ring-2 ring-amber-400 hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  : "cursor-pointer bg-primary/15 hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                : "cursor-default bg-background"
+                ? isLocal
+                  ? "cursor-pointer bg-emerald-50 hover:bg-emerald-100"
+                  : isSearching && isMatch
+                    ? "cursor-pointer bg-amber-200 ring-2 ring-amber-400 hover:bg-amber-300"
+                    : "cursor-pointer bg-primary/15 hover:bg-primary/25"
+                : "cursor-pointer bg-muted/30 hover:bg-muted/50"
             )}
             aria-label={
               occupied
                 ? `${dateKey} ${room.name} ${timeSlot.startTime} 已占用`
-                : `${dateKey} ${room.name} ${timeSlot.startTime} 空闲`
+                : `${dateKey} ${room.name} ${timeSlot.startTime} 空闲，点击申请`
             }
           >
             {occupied && slot && (
               <span
                 className={cn(
                   "block truncate px-1 text-xs font-medium",
-                  isSearching && isMatch ? "text-amber-900" : "text-primary"
+                  isLocal
+                    ? "text-emerald-700"
+                    : isSearching && isMatch
+                      ? "text-amber-900"
+                      : "text-primary"
                 )}
               >
                 {slot.projectName}
@@ -454,6 +519,12 @@ function BookingDialog({
             <dt className="text-muted-foreground">项目名</dt>
             <dd className="font-medium">{slot.projectName}</dd>
           </div>
+          {slot.phone && (
+            <div className="grid grid-cols-[80px_1fr] gap-2">
+              <dt className="text-muted-foreground">联系电话</dt>
+              <dd className="font-medium">{slot.phone}</dd>
+            </div>
+          )}
         </dl>
       </DialogContent>
     </Dialog>
