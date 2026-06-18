@@ -150,14 +150,6 @@ export function isToday(date: Date): boolean {
 }
 
 /**
- * 判断指定日期字符串是否为今天。
- * @param dateKey - 日期字符串，格式为 yyyy-MM-dd
- */
-export function isTodayByKey(dateKey: string): boolean {
-  return dateKey === toDateKey(new Date());
-}
-
-/**
  * 判断指定日期所在周是否为当前周（包含今天）。
  */
 export function isCurrentWeek(anchorDate: Date): boolean {

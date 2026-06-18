@@ -260,7 +260,7 @@ export function StudioSchedulePage() {
           </div>
         )}
 
-        <div className="mt-6 flex items-center gap-4 text-xs text-muted-foreground">
+        <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-3 rounded-sm border bg-muted/40" />
             空闲（点击申请）
@@ -279,6 +279,12 @@ export function StudioSchedulePage() {
               搜索匹配
             </span>
           )}
+          <span className="flex items-center gap-1.5">
+            <span className="relative inline-block h-3 w-3 rounded-sm border bg-card ring-2 ring-primary ring-offset-1">
+              <span className="absolute -right-1 -top-1 h-0 w-0 border-t-[8px] border-t-primary border-l-[8px] border-l-transparent" />
+            </span>
+            今天（高亮边框 + 角标）
+          </span>
         </div>
       </div>
 
@@ -317,6 +323,14 @@ interface DayGridProps {
 /**
  * 单日 Grid：行=时段，列=房间。
  * 搜索激活时仅在有匹配预约的日期渲染。
+ *
+ * @param date - 该网格对应的日期
+ * @param rooms - 房间列表
+ * @param slotMap - 所有预约的单元格索引 Map
+ * @param filteredSlotMap - 搜索过滤后的预约单元格索引 Map
+ * @param onCellClick - 单元格点击回调
+ * @param isSearching - 是否处于搜索模式
+ * @param isToday - 该日期是否为今天，为 true 时显示高亮边框、角标及特殊标题背景
  */
 function DayGrid({
   date,
@@ -337,20 +351,17 @@ function DayGrid({
 
   return (
     <section
+      aria-label={isTodayFlag ? `${formatDayHeader(date)} 今天` : formatDayHeader(date)}
       className={cn(
         "relative overflow-hidden rounded-lg border bg-card shadow-sm",
         isTodayFlag && "ring-2 ring-primary ring-offset-2"
       )}
     >
       {isTodayFlag && (
-        <div className="absolute right-0 top-0 z-10">
-          <div className="relative">
-            <div className="h-16 w-16 overflow-hidden">
-              <div className="absolute right-[-28px] top-[6px] w-[120px] rotate-45 bg-primary py-1 text-center text-[10px] font-bold text-primary-foreground shadow-sm">
-                今天
-              </div>
-            </div>
-          </div>
+        <div className="pointer-events-none absolute right-0 top-0 z-10 h-0 w-0 border-t-[40px] border-t-primary border-l-[40px] border-l-transparent">
+          <span className="absolute right-[-32px] top-[-34px] block w-[100px] rotate-45 text-center text-[10px] font-bold text-primary-foreground">
+            今天
+          </span>
         </div>
       )}
       <h2
@@ -360,6 +371,9 @@ function DayGrid({
         )}
       >
         {formatDayHeader(date)}
+        {isTodayFlag && (
+          <span className="sr-only">（今天）</span>
+        )}
       </h2>
       <div
         className="grid text-sm"
