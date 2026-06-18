@@ -48,7 +48,7 @@ const data = scheduleData as StudioScheduleData;
  */
 export function StudioSchedulePage() {
   const { rooms, slots: mockSlots } = data;
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const weekParam = searchParams.get("week");
   const baseWeek = useMemo(() => getMockBaseWeek(mockSlots), [mockSlots]);
   const initialWeek = useMemo(() => {
@@ -104,9 +104,25 @@ export function StudioSchedulePage() {
       );
     });
 
-  const handlePrevWeek = () => setWeekAnchor((d) => subWeeks(d, 1));
-  const handleNextWeek = () => setWeekAnchor((d) => addWeeks(d, 1));
-  const handleGoToCurrentWeek = () => setWeekAnchor(getCurrentWeekAnchor());
+  const handlePrevWeek = () => {
+    setWeekAnchor((d) => {
+      const newDate = subWeeks(d, 1);
+      setSearchParams({ week: format(newDate, "yyyy-MM-dd") });
+      return newDate;
+    });
+  };
+  const handleNextWeek = () => {
+    setWeekAnchor((d) => {
+      const newDate = addWeeks(d, 1);
+      setSearchParams({ week: format(newDate, "yyyy-MM-dd") });
+      return newDate;
+    });
+  };
+  const handleGoToCurrentWeek = () => {
+    const currentWeek = getCurrentWeekAnchor();
+    setWeekAnchor(currentWeek);
+    setSearchParams({ week: format(currentWeek, "yyyy-MM-dd") });
+  };
   const isCurrentWeekFlag = useMemo(() => isCurrentWeek(weekAnchor), [weekAnchor]);
 
   const handleCellClick = useCallback(
@@ -178,33 +194,36 @@ export function StudioSchedulePage() {
                 <Printer className="h-4 w-4" />
                 打印预览
               </Link>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handlePrevWeek}
-                aria-label="上一周"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="min-w-[220px] text-center text-sm font-medium">
-                {formatWeekLabel(weekAnchor)}
-              </span>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleNextWeek}
-                aria-label="下一周"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleGoToCurrentWeek}
-                disabled={isCurrentWeekFlag}
-              >
-                回到本周
-              </Button>
             </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handlePrevWeek}
+              aria-label="上一周"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="min-w-[220px] text-center text-sm font-medium">
+              {formatWeekLabel(weekAnchor)}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleNextWeek}
+              aria-label="下一周"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleGoToCurrentWeek}
+              disabled={isCurrentWeekFlag}
+              aria-label="回到本周"
+            >
+              回到本周
+            </Button>
           </div>
           <div className="flex justify-start sm:justify-end">
             <SearchInput value={searchKeyword} onChange={setSearchKeyword} />
