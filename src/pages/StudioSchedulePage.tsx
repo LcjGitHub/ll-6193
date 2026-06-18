@@ -34,6 +34,7 @@ import {
   getMockBaseWeek,
   getWeekDays,
   isCurrentWeek,
+  isToday,
   loadLocalSlots,
   saveLocalSlots,
   subWeeks,
@@ -253,6 +254,7 @@ export function StudioSchedulePage() {
                 filteredSlotMap={filteredSlotMap}
                 onCellClick={handleCellClick}
                 isSearching={isSearching}
+                isToday={isToday(day)}
               />
             ))}
           </div>
@@ -309,6 +311,7 @@ interface DayGridProps {
   filteredSlotMap: Map<string, ScheduleSlot>;
   onCellClick: (date: string, roomId: string, startTime: string) => void;
   isSearching: boolean;
+  isToday: boolean;
 }
 
 /**
@@ -322,6 +325,7 @@ function DayGrid({
   filteredSlotMap,
   onCellClick,
   isSearching,
+  isToday: isTodayFlag,
 }: DayGridProps) {
   const dateKey = toDateKey(date);
 
@@ -332,8 +336,29 @@ function DayGrid({
   if (isSearching && !hasMatch) return null;
 
   return (
-    <section className="overflow-hidden rounded-lg border bg-card shadow-sm">
-      <h2 className="border-b bg-muted/60 px-4 py-2 text-sm font-semibold">
+    <section
+      className={cn(
+        "relative overflow-hidden rounded-lg border bg-card shadow-sm",
+        isTodayFlag && "ring-2 ring-primary ring-offset-2"
+      )}
+    >
+      {isTodayFlag && (
+        <div className="absolute right-0 top-0 z-10">
+          <div className="relative">
+            <div className="h-16 w-16 overflow-hidden">
+              <div className="absolute right-[-28px] top-[6px] w-[120px] rotate-45 bg-primary py-1 text-center text-[10px] font-bold text-primary-foreground shadow-sm">
+                今天
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      <h2
+        className={cn(
+          "border-b px-4 py-2 text-sm font-semibold",
+          isTodayFlag ? "bg-primary/15" : "bg-muted/60"
+        )}
+      >
         {formatDayHeader(date)}
       </h2>
       <div
