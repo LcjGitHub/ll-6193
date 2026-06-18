@@ -155,6 +155,7 @@ export function StudioSchedulePage() {
         bookedBy: formData.bookedBy,
         projectName: formData.projectName,
         phone: formData.phone,
+        notes: formData.notes,
       };
       setLocalSlots((prev) => [...prev, newSlot]);
     },
@@ -585,6 +586,12 @@ function BookingDialog({
             <div className="grid grid-cols-[80px_1fr] gap-2">
               <dt className="text-muted-foreground">联系电话</dt>
               <dd className="font-medium">{slot.phone}</dd>
+            </div>
+          )}
+          {slot.notes && (
+            <div className="grid grid-cols-[80px_1fr] gap-2">
+              <dt className="text-muted-foreground">备注</dt>
+              <dd className="font-medium whitespace-pre-wrap">{slot.notes}</dd>
             </div>
           )}
         </dl>

@@ -12,7 +12,9 @@
       "startTime": "09:00",
       "endTime": "11:00",
       "bookedBy": "张明",
-      "projectName": "城市之声播客 S3"
+      "projectName": "城市之声播客 S3",
+      "phone": "13812345678",
+      "notes": "需准备最新一期话题稿，嘉宾到场时间 08:45"
     },
     {
       "id": "slot-002",
@@ -21,7 +23,9 @@
       "startTime": "14:00",
       "endTime": "16:00",
       "bookedBy": "李薇",
-      "projectName": "品牌广告配音"
+      "projectName": "品牌广告配音",
+      "phone": "13987654321",
+      "notes": "客户要求女声中低音，提供脚本 PDF"
     },
     {
       "id": "slot-003",
@@ -30,7 +34,9 @@
       "startTime": "10:00",
       "endTime": "12:00",
       "bookedBy": "王浩",
-      "projectName": "有声书《长安》"
+      "projectName": "有声书《长安》",
+      "phone": "13611112222",
+      "notes": "录制第 12-15 章，需要安静环境"
     },
     {
       "id": "slot-004",
@@ -39,7 +45,9 @@
       "startTime": "09:00",
       "endTime": "10:00",
       "bookedBy": "陈静",
-      "projectName": "游戏角色试音"
+      "projectName": "游戏角色试音",
+      "phone": "13533334444",
+      "notes": "3 个角色台词，自备耳机"
     },
     {
       "id": "slot-005",
@@ -48,7 +56,9 @@
       "startTime": "09:00",
       "endTime": "12:00",
       "bookedBy": "赵磊",
-      "projectName": "纪录片旁白"
+      "projectName": "纪录片旁白",
+      "phone": "13755556666",
+      "notes": "自然人文类纪录片，需沉稳声线"
     },
     {
       "id": "slot-006",
@@ -57,7 +67,9 @@
       "startTime": "14:00",
       "endTime": "17:00",
       "bookedBy": "孙悦",
-      "projectName": "电台节目录制"
+      "projectName": "电台节目录制",
+      "phone": "13877778888",
+      "notes": "晚间黄金档节目，含听众连线环节"
     },
     {
       "id": "slot-007",
@@ -66,7 +78,9 @@
       "startTime": "15:00",
       "endTime": "16:00",
       "bookedBy": "周洋",
-      "projectName": "短视频配音"
+      "projectName": "短视频配音",
+      "phone": "13999990000",
+      "notes": "5 条 15 秒产品宣传短视频"
     },
     {
       "id": "slot-008",
@@ -75,7 +89,9 @@
       "startTime": "10:00",
       "endTime": "11:00",
       "bookedBy": "吴芳",
-      "projectName": "企业宣传片"
+      "projectName": "企业宣传片",
+      "phone": "13622223333",
+      "notes": "集团年度宣传片，中英文各一版"
     },
     {
       "id": "slot-009",
@@ -84,7 +100,9 @@
       "startTime": "09:00",
       "endTime": "11:00",
       "bookedBy": "郑凯",
-      "projectName": "儿童故事专辑"
+      "projectName": "儿童故事专辑",
+      "phone": "13544445555",
+      "notes": "童话系列，声线需活泼有亲和力"
     },
     {
       "id": "slot-010",
@@ -93,7 +111,9 @@
       "startTime": "14:00",
       "endTime": "16:00",
       "bookedBy": "林娜",
-      "projectName": "外语教材朗读"
+      "projectName": "外语教材朗读",
+      "phone": "13766667777",
+      "notes": "初中英语听力教材，发音标准清晰"
     },
     {
       "id": "slot-011",
@@ -102,7 +122,9 @@
       "startTime": "14:00",
       "endTime": "17:00",
       "bookedBy": "黄杰",
-      "projectName": "音乐 MV 人声"
+      "projectName": "音乐 MV 人声",
+      "phone": "13888889999",
+      "notes": "原创歌曲录制，自带伴奏文件"
     },
     {
       "id": "slot-012",
@@ -111,7 +133,9 @@
       "startTime": "10:00",
       "endTime": "12:00",
       "bookedBy": "何琳",
-      "projectName": "新闻播报练习"
+      "projectName": "新闻播报练习",
+      "phone": "13900001111",
+      "notes": "播音专业学生期末作业录制"
     },
     {
       "id": "slot-013",
@@ -120,7 +144,9 @@
       "startTime": "09:00",
       "endTime": "11:00",
       "bookedBy": "马超",
-      "projectName": "动画配音"
+      "projectName": "动画配音",
+      "phone": "13633334444",
+      "notes": "国产动画主角配音，共 4 集台词"
     },
     {
       "id": "slot-014",
@@ -129,7 +155,9 @@
       "startTime": "15:00",
       "endTime": "17:00",
       "bookedBy": "徐敏",
-      "projectName": "访谈节目"
+      "projectName": "访谈节目",
+      "phone": "13555556666",
+      "notes": "人物深度访谈，嘉宾为业界知名人士"
     },
     {
       "id": "slot-015",
@@ -138,7 +166,9 @@
       "startTime": "09:00",
       "endTime": "10:00",
       "bookedBy": "高翔",
-      "projectName": "产品发布会旁白"
+      "projectName": "产品发布会旁白",
+      "phone": "13777778888",
+      "notes": "新品上市发布会开场视频旁白"
     },
     {
       "id": "slot-016",
@@ -147,7 +177,9 @@
       "startTime": "14:00",
       "endTime": "15:00",
       "bookedBy": "罗丹",
-      "projectName": "公益广告"
+      "projectName": "公益广告",
+      "phone": "13899990000",
+      "notes": "环保主题公益宣传广告"
     },
     {
       "id": "slot-017",
@@ -156,7 +188,9 @@
       "startTime": "09:00",
       "endTime": "11:00",
       "bookedBy": "冯雪",
-      "projectName": "历史纪录片"
+      "projectName": "历史纪录片",
+      "phone": "13911112222",
+      "notes": "古代史题材纪录片，需要厚重感声线"
     },
     {
       "id": "slot-018",
@@ -165,7 +199,9 @@
       "startTime": "14:00",
       "endTime": "16:00",
       "bookedBy": "邓伟",
-      "projectName": "播客对谈"
+      "projectName": "播客对谈",
+      "phone": "13644445555",
+      "notes": "科技话题双人对谈节目"
     }
   ]
 }

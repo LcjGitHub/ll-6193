@@ -272,6 +272,7 @@ export function buildPrintPreviewData(
           bookedBy: slot?.bookedBy ?? "",
           projectName: slot?.projectName ?? "",
           phone: slot?.phone,
+          notes: slot?.notes,
           isOccupied: !!slot,
         };
       });

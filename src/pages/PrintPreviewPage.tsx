@@ -171,6 +171,11 @@ export function PrintPreviewPage() {
                                       电话：{cell.phone}
                                     </div>
                                   )}
+                                  {cell.notes && (
+                                    <div className="text-muted-foreground">
+                                      备注：{cell.notes}
+                                    </div>
+                                  )}
                                 </div>
                               ) : (
                                 <div className="text-xs text-muted-foreground/40 italic">

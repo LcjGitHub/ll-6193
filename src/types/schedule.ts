@@ -13,6 +13,7 @@ export interface ScheduleSlot {
   bookedBy: string;
   projectName: string;
   phone?: string;
+  notes?: string;
 }
 
 export interface StudioScheduleData {
@@ -47,6 +48,7 @@ export interface ApplicationFormData {
   bookedBy: string;
   projectName: string;
   phone: string;
+  notes: string;
 }
 
 export interface PendingCell {
@@ -64,6 +66,7 @@ export interface PrintPreviewCell {
   bookedBy: string;
   projectName: string;
   phone?: string;
+  notes?: string;
   isOccupied: boolean;
 }
 

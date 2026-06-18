@@ -32,10 +32,11 @@ export function ApplicationDialog({
     bookedBy: "",
     projectName: "",
     phone: "",
+    notes: "",
   });
 
   const resetAndClose = () => {
-    setForm({ bookedBy: "", projectName: "", phone: "" });
+    setForm({ bookedBy: "", projectName: "", phone: "", notes: "" });
     onOpenChange(false);
   };
 
@@ -100,6 +101,19 @@ export function ApplicationDialog({
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
               className="rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               placeholder="请输入联系电话"
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <label htmlFor="app-notes" className="text-sm font-medium">
+              备注
+            </label>
+            <textarea
+              id="app-notes"
+              rows={3}
+              value={form.notes}
+              onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+              className="rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+              placeholder="选填，可补充特殊需求"
             />
           </div>
           <DialogFooter>
