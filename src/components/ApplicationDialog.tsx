@@ -18,6 +18,9 @@ interface ApplicationDialogProps {
   onSubmit: (cell: PendingCell, data: ApplicationFormData) => void;
 }
 
+/**
+ * 空闲时段申请 Dialog。
+ */
 export function ApplicationDialog({
   cell,
   roomName,

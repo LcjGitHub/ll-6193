@@ -384,16 +384,16 @@ function TimeSlotRow({
               !isLastRow && "border-b",
               idx < rooms.length - 1 && "border-r",
               occupied
-                ? isLocal
-                  ? "cursor-pointer bg-emerald-50 hover:bg-emerald-100"
-                  : isSearching && isMatch
-                    ? "cursor-pointer bg-amber-200 ring-2 ring-amber-400 hover:bg-amber-300"
+                ? isSearching && isMatch
+                  ? "cursor-pointer bg-amber-200 ring-2 ring-amber-400 hover:bg-amber-300"
+                  : isLocal
+                    ? "cursor-pointer bg-emerald-50 hover:bg-emerald-100"
                     : "cursor-pointer bg-primary/15 hover:bg-primary/25"
                 : "cursor-pointer bg-muted/30 hover:bg-muted/50"
             )}
             aria-label={
-              occupied
-                ? `${dateKey} ${room.name} ${timeSlot.startTime} 已占用`
+              occupied && slot
+                ? `${dateKey} ${room.name} ${timeSlot.startTime} ${slot.projectName} 已占用`
                 : `${dateKey} ${room.name} ${timeSlot.startTime} 空闲，点击申请`
             }
           >
@@ -401,10 +401,10 @@ function TimeSlotRow({
               <span
                 className={cn(
                   "block truncate px-1 text-xs font-medium",
-                  isLocal
-                    ? "text-emerald-700"
-                    : isSearching && isMatch
-                      ? "text-amber-900"
+                  isSearching && isMatch
+                    ? "text-amber-900"
+                    : isLocal
+                      ? "text-emerald-700"
                       : "text-primary"
                 )}
               >
