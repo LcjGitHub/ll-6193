@@ -1,6 +1,7 @@
-import { ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutGrid, Printer } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { format } from "date-fns";
 import { ApplicationDialog } from "@/components/ApplicationDialog";
 import { SearchInput } from "@/components/SearchInput";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,6 @@ import {
   formatWeekLabel,
   getMockBaseWeek,
   getWeekDays,
-  isSlotOccupied,
   subWeeks,
   toDateKey,
 } from "@/lib/schedule-utils";
@@ -141,6 +141,13 @@ export function StudioSchedulePage() {
               >
                 <LayoutGrid className="h-4 w-4" />
                 房间概览
+              </Link>
+              <Link
+                to={`/preview?week=${format(weekAnchor, "yyyy-MM-dd")}`}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Printer className="h-4 w-4" />
+                打印预览
               </Link>
               <Button
                 variant="outline"

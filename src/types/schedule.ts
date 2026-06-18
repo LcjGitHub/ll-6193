@@ -55,3 +55,31 @@ export interface PendingCell {
   startTime: string;
   endTime: string;
 }
+
+export interface PrintPreviewCell {
+  roomId: string;
+  roomName: string;
+  startTime: string;
+  endTime: string;
+  bookedBy: string;
+  projectName: string;
+  phone?: string;
+  isOccupied: boolean;
+}
+
+export interface PrintPreviewDay {
+  date: string;
+  dateLabel: string;
+  weekDay: string;
+  rooms: {
+    roomId: string;
+    roomName: string;
+    slots: PrintPreviewCell[];
+  }[];
+}
+
+export interface PrintPreviewData {
+  weekLabel: string;
+  days: PrintPreviewDay[];
+  timeSlots: TimeSlotRow[];
+}

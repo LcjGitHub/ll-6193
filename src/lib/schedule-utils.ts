@@ -10,6 +10,8 @@ import {
 import { zhCN } from "date-fns/locale";
 import type {
   CellKey,
+  PrintPreviewData,
+  PrintPreviewDay,
   Room,
   ScheduleSlot,
   TimeSlotRow,
@@ -208,5 +210,58 @@ export function calculateWeeklyOccupancy(
     totalBookings,
     totalOccupiedSlots,
     roomStats: Array.from(roomStatMap.values()),
+  };
+}
+
+export function buildPrintPreviewData(
+  slots: ScheduleSlot[],
+  rooms: Room[],
+  weekAnchor: Date
+): PrintPreviewData {
+  const weekDays = getWeekDays(weekAnchor);
+  const slotMap = buildSlotMap(slots);
+  const weekLabel = formatWeekLabel(weekAnchor);
+
+  const days: PrintPreviewDay[] = weekDays.map((date) => {
+    const dateKey = toDateKey(date);
+    const dateLabel = format(date, "M月d日", { locale: zhCN });
+    const weekDay = format(date, "EEEE", { locale: zhCN });
+
+    const dayRooms = rooms.map((room) => {
+      const daySlots = TIME_SLOTS.map((timeSlot) => {
+        const key = buildCellKey(dateKey, room.id, timeSlot.startTime);
+        const slot = slotMap.get(key);
+
+        return {
+          roomId: room.id,
+          roomName: room.name,
+          startTime: timeSlot.startTime,
+          endTime: timeSlot.endTime,
+          bookedBy: slot?.bookedBy ?? "",
+          projectName: slot?.projectName ?? "",
+          phone: slot?.phone,
+          isOccupied: !!slot,
+        };
+      });
+
+      return {
+        roomId: room.id,
+        roomName: room.name,
+        slots: daySlots,
+      };
+    });
+
+    return {
+      date: dateKey,
+      dateLabel,
+      weekDay,
+      rooms: dayRooms,
+    };
+  });
+
+  return {
+    weekLabel,
+    days,
+    timeSlots: TIME_SLOTS,
   };
 }
