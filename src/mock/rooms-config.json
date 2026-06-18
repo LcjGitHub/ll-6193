@@ -1,0 +1,22 @@
+{
+  "rooms": [
+    {
+      "id": "room-a",
+      "name": "A 棚",
+      "capacity": 8,
+      "equipment": "配备 Neumann U87 电容麦克风、Neve 1073 话放、Pro Tools HDX 系统、Focal Trio11 Be 监听音箱、5.1 环绕声系统，适合大型乐队同期录音和专业混音工作。"
+    },
+    {
+      "id": "room-b",
+      "name": "B 棚",
+      "capacity": 6,
+      "equipment": "配备 AKG C414 电容麦克风、API 512C 话放、Logic Pro X 工作站、Genelec 8351B 监听音箱、UAD Apollo x8p 音频接口，适合人声录制和中小型音乐制作。"
+    },
+    {
+      "id": "room-c",
+      "name": "C 棚",
+      "capacity": 4,
+      "equipment": "配备 Shure SM7B 动圈麦克风、Focusrite Scarlett 18i20 接口、Ableton Live 套件、Yamaha HS8 监听音箱，适合播客录制、配音和个人音乐创作。"
+    }
+  ]
+}
