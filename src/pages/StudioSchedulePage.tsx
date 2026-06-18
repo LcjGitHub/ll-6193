@@ -30,8 +30,10 @@ import {
   filterSlotsByKeyword,
   formatDayHeader,
   formatWeekLabel,
+  getCurrentWeekAnchor,
   getMockBaseWeek,
   getWeekDays,
+  isCurrentWeek,
   loadLocalSlots,
   saveLocalSlots,
   subWeeks,
@@ -104,6 +106,8 @@ export function StudioSchedulePage() {
 
   const handlePrevWeek = () => setWeekAnchor((d) => subWeeks(d, 1));
   const handleNextWeek = () => setWeekAnchor((d) => addWeeks(d, 1));
+  const handleGoToCurrentWeek = () => setWeekAnchor(getCurrentWeekAnchor());
+  const isCurrentWeekFlag = useMemo(() => isCurrentWeek(weekAnchor), [weekAnchor]);
 
   const handleCellClick = useCallback(
     (date: string, roomId: string, startTime: string) => {
@@ -192,6 +196,13 @@ export function StudioSchedulePage() {
                 aria-label="下一周"
               >
                 <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleGoToCurrentWeek}
+                disabled={isCurrentWeekFlag}
+              >
+                回到本周
               </Button>
             </div>
           </div>

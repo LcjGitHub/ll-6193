@@ -131,6 +131,27 @@ export function getMockBaseWeek(slots: ScheduleSlot[]): Date {
   return startOfWeek(parseISO(earliest), { weekStartsOn: 1 });
 }
 
+/**
+ * 获取当前周的锚点日期（今天所在周的周一）。
+ */
+export function getCurrentWeekAnchor(): Date {
+  return startOfWeek(new Date(), { weekStartsOn: 1 });
+}
+
+/**
+ * 判断指定日期所在周是否为当前周（包含今天）。
+ */
+export function isCurrentWeek(anchorDate: Date): boolean {
+  const { start, end } = getWeekRange(anchorDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const startOfDay = new Date(start);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(end);
+  endOfDay.setHours(23, 59, 59, 999);
+  return today >= startOfDay && today <= endOfDay;
+}
+
 export { addWeeks, subWeeks };
 
 /**
