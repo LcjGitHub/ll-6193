@@ -270,28 +270,27 @@ interface WeeklyStatsCardsProps {
 
 function WeeklyStatsCards({ stats }: WeeklyStatsCardsProps) {
   return (
-    <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <StatCard
-        label="本周总预约"
-        value={stats.totalBookings}
-        unit="场次"
-        variant="primary"
-      />
-      <StatCard
-        label="总占用时段"
-        value={stats.totalOccupiedSlots}
-        unit="时段"
-        variant="default"
-      />
-      {stats.roomStats.map((roomStat) => (
+    <section className="mb-8">
+      <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
+        本周占用统计
+      </h2>
+      <div className="grid grid-cols-4 gap-3">
         <StatCard
-          key={roomStat.roomId}
-          label={roomStat.roomName}
-          value={roomStat.occupiedSlots}
-          unit="时段"
-          variant="default"
+          label="本周总预约"
+          value={stats.totalBookings}
+          unit="场次"
+          variant="primary"
         />
-      ))}
+        {stats.roomStats.map((roomStat) => (
+          <StatCard
+            key={roomStat.roomId}
+            label={`${roomStat.roomName} 占用时段`}
+            value={roomStat.occupiedSlots}
+            unit="时段"
+            variant="default"
+          />
+        ))}
+      </div>
     </section>
   );
 }

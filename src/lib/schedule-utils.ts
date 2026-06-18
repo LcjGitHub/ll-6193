@@ -131,6 +131,10 @@ export function getMockBaseWeek(slots: ScheduleSlot[]): Date {
 
 export { addWeeks, subWeeks };
 
+/**
+ * 计算单个预约记录跨越的时段数量。
+ * 根据 TIME_SLOTS 定义的时段粒度，按开始/结束时间匹配索引并计数。
+ */
 function countOccupiedSlotsForSlot(slot: ScheduleSlot): number {
   const startIdx = TIME_SLOTS.findIndex((t) => t.startTime === slot.startTime);
   const endIdx = TIME_SLOTS.findIndex((t) => t.endTime === slot.endTime);
@@ -138,6 +142,14 @@ function countOccupiedSlotsForSlot(slot: ScheduleSlot): number {
   return endIdx - startIdx + 1;
 }
 
+/**
+ * 计算指定周的占用统计数据。
+ *
+ * @param slots - 所有预约记录
+ * @param rooms - 所有房间列表
+ * @param weekAnchor - 目标周的锚点日期（该周内任意一天均可）
+ * @returns 本周统计结果，包含总预约场次、总占用时段以及各房间占用时段数
+ */
 export function calculateWeeklyOccupancy(
   slots: ScheduleSlot[],
   rooms: Room[],
