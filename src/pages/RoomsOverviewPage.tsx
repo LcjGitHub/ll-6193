@@ -1,17 +1,20 @@
 import { ArrowLeft, Users } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import roomsConfig from "@/mock/rooms-config.json";
-import type { Room } from "@/types/schedule";
+import type { RoomOverview, RoomsConfigData } from "@/types/rooms";
 import { cn } from "@/lib/utils";
 
-const { rooms } = roomsConfig as { rooms: Room[] };
+const rooms = (roomsConfig as RoomsConfigData).rooms;
 
 interface RoomCardProps {
-  room: Room;
+  room: RoomOverview;
   index: number;
 }
 
+/**
+ * 房间卡片组件。
+ */
 function RoomCard({ room, index }: RoomCardProps) {
   const gradients = [
     "from-primary/20 to-primary/5",
@@ -47,12 +50,13 @@ function RoomCard({ room, index }: RoomCardProps) {
   );
 }
 
+/**
+ * 录音棚房间概览页面。
+ */
 export function RoomsOverviewPage() {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate("/");
-  };
+  useEffect(() => {
+    document.title = "房间概览";
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -64,10 +68,13 @@ export function RoomsOverviewPage() {
               {rooms.length} 个录音棚 · 查看房间详情与设备配置
             </p>
           </div>
-          <Button variant="outline" onClick={handleBack}>
+          <Link
+            to="/"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <ArrowLeft className="h-4 w-4" />
             返回排期首页
-          </Button>
+          </Link>
         </header>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
