@@ -22,11 +22,11 @@ import {
   addWeeks,
   buildSlotMap,
   calculateWeeklyOccupancy,
+  filterSlotsByKeyword,
   formatDayHeader,
   formatWeekLabel,
   getMockBaseWeek,
   getWeekDays,
-  isSlotMatchKeyword,
   isSlotOccupied,
   subWeeks,
   toDateKey,
@@ -51,6 +51,23 @@ export function StudioSchedulePage() {
     () => calculateWeeklyOccupancy(slots, rooms, weekAnchor),
     [slots, rooms, weekAnchor]
   );
+
+  const isSearching = searchKeyword.trim().length > 0;
+  const filteredSlots = useMemo(
+    () => filterSlotsByKeyword(slots, searchKeyword),
+    [slots, searchKeyword]
+  );
+  const filteredSlotMap = useMemo(
+    () => buildSlotMap(filteredSlots),
+    [filteredSlots]
+  );
+  const hasSearchResults =
+    !isSearching || weekDays.some((day) => {
+      const dateKey = toDateKey(day);
+      return TIME_SLOTS.some((t) =>
+        rooms.some((r) => filteredSlotMap.has(`${dateKey}|${r.id}|${t.startTime}`))
+      );
+    });
 
   const handlePrevWeek = () => setWeekAnchor((d) => subWeeks(d, 1));
   const handleNextWeek = () => setWeekAnchor((d) => addWeeks(d, 1));
@@ -115,18 +132,30 @@ export function StudioSchedulePage() {
 
         <WeeklyStatsCards stats={stats} />
 
-        <div className="space-y-6">
-          {weekDays.map((day) => (
-            <DayGrid
-              key={toDateKey(day)}
-              date={day}
-              rooms={rooms}
-              slotMap={slotMap}
-              onCellClick={handleCellClick}
-              searchKeyword={searchKeyword}
-            />
-          ))}
-        </div>
+        {!hasSearchResults && isSearching ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed bg-card py-16 text-center">
+            <p className="text-sm font-medium text-muted-foreground">
+              未找到匹配「{searchKeyword.trim()}」的预约记录
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              请尝试其他关键字，或清空搜索恢复完整视图
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {weekDays.map((day) => (
+              <DayGrid
+                key={toDateKey(day)}
+                date={day}
+                rooms={rooms}
+                slotMap={slotMap}
+                filteredSlotMap={filteredSlotMap}
+                onCellClick={handleCellClick}
+                isSearching={isSearching}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="mt-6 flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
@@ -137,6 +166,12 @@ export function StudioSchedulePage() {
             <span className="inline-block h-3 w-3 rounded-sm border bg-primary/20 border-primary/40" />
             已占用（可点击）
           </span>
+          {isSearching && (
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block h-3 w-3 rounded-sm border bg-amber-200 ring-2 ring-amber-400" />
+              搜索匹配
+            </span>
+          )}
         </div>
       </div>
 
@@ -156,21 +191,30 @@ interface DayGridProps {
   date: Date;
   rooms: Room[];
   slotMap: Map<string, ScheduleSlot>;
+  filteredSlotMap: Map<string, ScheduleSlot>;
   onCellClick: (date: string, roomId: string, startTime: string) => void;
-  searchKeyword: string;
+  isSearching: boolean;
 }
 
 /**
  * 单日 Grid：行=时段，列=房间。
+ * 搜索激活时仅在有匹配预约的日期渲染。
  */
 function DayGrid({
   date,
   rooms,
   slotMap,
+  filteredSlotMap,
   onCellClick,
-  searchKeyword,
+  isSearching,
 }: DayGridProps) {
   const dateKey = toDateKey(date);
+
+  const hasMatch = TIME_SLOTS.some((t) =>
+    rooms.some((r) => filteredSlotMap.has(`${dateKey}|${r.id}|${t.startTime}`))
+  );
+
+  if (isSearching && !hasMatch) return null;
 
   return (
     <section className="overflow-hidden rounded-lg border bg-card shadow-sm">
@@ -202,9 +246,10 @@ function DayGrid({
             timeSlot={timeSlot}
             rooms={rooms}
             slotMap={slotMap}
+            filteredSlotMap={filteredSlotMap}
             onCellClick={onCellClick}
             isLastRow={rowIdx === TIME_SLOTS.length - 1}
-            searchKeyword={searchKeyword}
+            isSearching={isSearching}
           />
         ))}
       </div>
@@ -217,9 +262,10 @@ interface TimeSlotRowProps {
   timeSlot: { startTime: string; endTime: string };
   rooms: Room[];
   slotMap: Map<string, ScheduleSlot>;
+  filteredSlotMap: Map<string, ScheduleSlot>;
   onCellClick: (date: string, roomId: string, startTime: string) => void;
   isLastRow: boolean;
-  searchKeyword: string;
+  isSearching: boolean;
 }
 
 function TimeSlotRow({
@@ -227,12 +273,11 @@ function TimeSlotRow({
   timeSlot,
   rooms,
   slotMap,
+  filteredSlotMap,
   onCellClick,
   isLastRow,
-  searchKeyword,
+  isSearching,
 }: TimeSlotRowProps) {
-  const isSearching = searchKeyword.trim().length > 0;
-
   return (
     <>
       <div
@@ -252,8 +297,9 @@ function TimeSlotRow({
           timeSlot.startTime
         );
         const slot = slotMap.get(`${dateKey}|${room.id}|${timeSlot.startTime}`);
-        const isMatch =
-          occupied && slot && isSlotMatchKeyword(slot, searchKeyword);
+        const isMatch = filteredSlotMap.has(
+          `${dateKey}|${room.id}|${timeSlot.startTime}`
+        );
 
         if (isSearching && !isMatch) {
           return (

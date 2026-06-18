@@ -2,10 +2,26 @@ import { Search, X } from "lucide-react";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * 预约检索搜索输入框组件。
+ *
+ * 提供关键字输入和一键清除功能，用于在排期页面中按预约人姓名或项目名称筛选预约。
+ * 输入内容后右侧显示清除按钮，点击清除后自动重新聚焦输入框。
+ *
+ * @example
+ * ```tsx
+ * const [keyword, setKeyword] = useState("");
+ * <SearchInput value={keyword} onChange={setKeyword} />
+ * ```
+ */
 interface SearchInputProps {
+  /** 当前搜索关键字，受控值 */
   value: string;
+  /** 搜索关键字变更回调 */
   onChange: (value: string) => void;
+  /** 输入框占位文本，默认为「搜索预约人姓名或项目名称...」 */
   placeholder?: string;
+  /** 额外 CSS 类名 */
   className?: string;
 }
 

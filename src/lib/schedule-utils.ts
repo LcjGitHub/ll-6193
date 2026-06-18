@@ -155,26 +155,6 @@ export function filterSlotsByKeyword(
 }
 
 /**
- * 判断某个预约记录是否匹配关键字。
- *
- * @param slot - 预约记录
- * @param keyword - 搜索关键字
- * @returns 是否匹配
- */
-export function isSlotMatchKeyword(
-  slot: ScheduleSlot,
-  keyword: string
-): boolean {
-  const trimmed = keyword.trim();
-  if (!trimmed) return true;
-  const lower = trimmed.toLowerCase();
-  return (
-    slot.bookedBy.toLowerCase().includes(lower) ||
-    slot.projectName.toLowerCase().includes(lower)
-  );
-}
-
-/**
  * 计算单个预约记录跨越的时段数量。
  * 根据 TIME_SLOTS 定义的时段粒度，按开始/结束时间匹配索引并计数。
  */
