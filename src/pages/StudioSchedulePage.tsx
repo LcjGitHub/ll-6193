@@ -573,27 +573,27 @@ function BookingDialog({
             {roomName ? ` · ${roomName}` : ""}
           </DialogDescription>
         </DialogHeader>
-        <dl className="grid gap-3 text-sm">
-          <div className="grid grid-cols-[80px_1fr] gap-2">
-            <dt className="text-muted-foreground">预约人</dt>
-            <dd className="font-medium">{slot.bookedBy}</dd>
+        <dl role="list" className="grid gap-3 text-sm">
+          <div role="listitem" className="grid grid-cols-[80px_1fr] gap-2" aria-labelledby="dt-bookedBy">
+            <dt id="dt-bookedBy" className="text-muted-foreground">预约人</dt>
+            <dd aria-labelledby="dt-bookedBy" className="font-medium">{slot.bookedBy}</dd>
           </div>
-          <div className="grid grid-cols-[80px_1fr] gap-2">
-            <dt className="text-muted-foreground">项目名</dt>
-            <dd className="font-medium">{slot.projectName}</dd>
+          <div role="listitem" className="grid grid-cols-[80px_1fr] gap-2" aria-labelledby="dt-projectName">
+            <dt id="dt-projectName" className="text-muted-foreground">项目名</dt>
+            <dd aria-labelledby="dt-projectName" className="font-medium">{slot.projectName}</dd>
           </div>
-          {slot.phone && (
-            <div className="grid grid-cols-[80px_1fr] gap-2">
-              <dt className="text-muted-foreground">联系电话</dt>
-              <dd className="font-medium">{slot.phone}</dd>
-            </div>
-          )}
-          {slot.notes && (
-            <div className="grid grid-cols-[80px_1fr] gap-2">
-              <dt className="text-muted-foreground">备注</dt>
-              <dd className="font-medium whitespace-pre-wrap">{slot.notes}</dd>
-            </div>
-          )}
+          <div role="listitem" className="grid grid-cols-[80px_1fr] gap-2" aria-labelledby="dt-phone">
+            <dt id="dt-phone" className="text-muted-foreground">联系电话</dt>
+            <dd aria-labelledby="dt-phone" className="font-medium">
+              {slot.phone ? slot.phone : <span className="text-muted-foreground/60">—</span>}
+            </dd>
+          </div>
+          <div role="listitem" className="grid grid-cols-[80px_1fr] gap-2" aria-labelledby="dt-notes">
+            <dt id="dt-notes" className="text-muted-foreground">备注</dt>
+            <dd aria-labelledby="dt-notes" className="font-medium whitespace-pre-wrap">
+              {slot.notes ? slot.notes : <span className="text-muted-foreground/60">—</span>}
+            </dd>
+          </div>
         </dl>
       </DialogContent>
     </Dialog>
