@@ -132,6 +132,49 @@ export function getMockBaseWeek(slots: ScheduleSlot[]): Date {
 export { addWeeks, subWeeks };
 
 /**
+ * 根据关键字筛选预约记录。
+ * 匹配预约人姓名（bookedBy）或项目名称（projectName）中包含关键字的预约。
+ * 不区分大小写。
+ *
+ * @param slots - 所有预约记录
+ * @param keyword - 搜索关键字，为空时返回全部记录
+ * @returns 匹配的预约记录数组
+ */
+export function filterSlotsByKeyword(
+  slots: ScheduleSlot[],
+  keyword: string
+): ScheduleSlot[] {
+  const trimmed = keyword.trim();
+  if (!trimmed) return slots;
+  const lower = trimmed.toLowerCase();
+  return slots.filter(
+    (slot) =>
+      slot.bookedBy.toLowerCase().includes(lower) ||
+      slot.projectName.toLowerCase().includes(lower)
+  );
+}
+
+/**
+ * 判断某个预约记录是否匹配关键字。
+ *
+ * @param slot - 预约记录
+ * @param keyword - 搜索关键字
+ * @returns 是否匹配
+ */
+export function isSlotMatchKeyword(
+  slot: ScheduleSlot,
+  keyword: string
+): boolean {
+  const trimmed = keyword.trim();
+  if (!trimmed) return true;
+  const lower = trimmed.toLowerCase();
+  return (
+    slot.bookedBy.toLowerCase().includes(lower) ||
+    slot.projectName.toLowerCase().includes(lower)
+  );
+}
+
+/**
  * 计算单个预约记录跨越的时段数量。
  * 根据 TIME_SLOTS 定义的时段粒度，按开始/结束时间匹配索引并计数。
  */

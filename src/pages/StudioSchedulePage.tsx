@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { SearchInput } from "@/components/SearchInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,6 +26,7 @@ import {
   formatWeekLabel,
   getMockBaseWeek,
   getWeekDays,
+  isSlotMatchKeyword,
   isSlotOccupied,
   subWeeks,
   toDateKey,
@@ -41,6 +43,7 @@ export function StudioSchedulePage() {
   const baseWeek = useMemo(() => getMockBaseWeek(slots), [slots]);
   const [weekAnchor, setWeekAnchor] = useState(baseWeek);
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   const weekDays = useMemo(() => getWeekDays(weekAnchor), [weekAnchor]);
   const slotMap = useMemo(() => buildSlotMap(slots), [slots]);
@@ -68,40 +71,45 @@ export function StudioSchedulePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-5xl px-4 py-8">
-        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">录音棚场次排期</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              3 房间 × 周视图 · 点击已占用时段查看详情
-            </p>
+        <header className="mb-6 flex flex-col gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">录音棚场次排期</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                3 房间 × 周视图 · 点击已占用时段查看详情
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                to="/rooms"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <LayoutGrid className="h-4 w-4" />
+                房间概览
+              </Link>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handlePrevWeek}
+                aria-label="上一周"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[220px] text-center text-sm font-medium">
+                {formatWeekLabel(weekAnchor)}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNextWeek}
+                aria-label="下一周"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              to="/rooms"
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <LayoutGrid className="h-4 w-4" />
-              房间概览
-            </Link>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handlePrevWeek}
-              aria-label="上一周"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="min-w-[220px] text-center text-sm font-medium">
-              {formatWeekLabel(weekAnchor)}
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleNextWeek}
-              aria-label="下一周"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          <div className="flex justify-start sm:justify-end">
+            <SearchInput value={searchKeyword} onChange={setSearchKeyword} />
           </div>
         </header>
 
@@ -115,6 +123,7 @@ export function StudioSchedulePage() {
               rooms={rooms}
               slotMap={slotMap}
               onCellClick={handleCellClick}
+              searchKeyword={searchKeyword}
             />
           ))}
         </div>
@@ -148,12 +157,19 @@ interface DayGridProps {
   rooms: Room[];
   slotMap: Map<string, ScheduleSlot>;
   onCellClick: (date: string, roomId: string, startTime: string) => void;
+  searchKeyword: string;
 }
 
 /**
  * 单日 Grid：行=时段，列=房间。
  */
-function DayGrid({ date, rooms, slotMap, onCellClick }: DayGridProps) {
+function DayGrid({
+  date,
+  rooms,
+  slotMap,
+  onCellClick,
+  searchKeyword,
+}: DayGridProps) {
   const dateKey = toDateKey(date);
 
   return (
@@ -188,6 +204,7 @@ function DayGrid({ date, rooms, slotMap, onCellClick }: DayGridProps) {
             slotMap={slotMap}
             onCellClick={onCellClick}
             isLastRow={rowIdx === TIME_SLOTS.length - 1}
+            searchKeyword={searchKeyword}
           />
         ))}
       </div>
@@ -202,6 +219,7 @@ interface TimeSlotRowProps {
   slotMap: Map<string, ScheduleSlot>;
   onCellClick: (date: string, roomId: string, startTime: string) => void;
   isLastRow: boolean;
+  searchKeyword: string;
 }
 
 function TimeSlotRow({
@@ -211,7 +229,10 @@ function TimeSlotRow({
   slotMap,
   onCellClick,
   isLastRow,
+  searchKeyword,
 }: TimeSlotRowProps) {
+  const isSearching = searchKeyword.trim().length > 0;
+
   return (
     <>
       <div
@@ -231,6 +252,21 @@ function TimeSlotRow({
           timeSlot.startTime
         );
         const slot = slotMap.get(`${dateKey}|${room.id}|${timeSlot.startTime}`);
+        const isMatch =
+          occupied && slot && isSlotMatchKeyword(slot, searchKeyword);
+
+        if (isSearching && !isMatch) {
+          return (
+            <div
+              key={room.id}
+              className={cn(
+                "min-h-[44px] bg-background",
+                !isLastRow && "border-b",
+                idx < rooms.length - 1 && "border-r"
+              )}
+            />
+          );
+        }
 
         return (
           <button
@@ -243,7 +279,9 @@ function TimeSlotRow({
               !isLastRow && "border-b",
               idx < rooms.length - 1 && "border-r",
               occupied
-                ? "cursor-pointer bg-primary/15 hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                ? isSearching && isMatch
+                  ? "cursor-pointer bg-amber-200 ring-2 ring-amber-400 hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  : "cursor-pointer bg-primary/15 hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 : "cursor-default bg-background"
             )}
             aria-label={
@@ -253,7 +291,12 @@ function TimeSlotRow({
             }
           >
             {occupied && slot && (
-              <span className="block truncate px-1 text-xs font-medium text-primary">
+              <span
+                className={cn(
+                  "block truncate px-1 text-xs font-medium",
+                  isSearching && isMatch ? "text-amber-900" : "text-primary"
+                )}
+              >
                 {slot.projectName}
               </span>
             )}
