@@ -1,0 +1,171 @@
+{
+  "rooms": [
+    { "id": "room-a", "name": "A 棚", "capacity": 8 },
+    { "id": "room-b", "name": "B 棚", "capacity": 6 },
+    { "id": "room-c", "name": "C 棚", "capacity": 4 }
+  ],
+  "slots": [
+    {
+      "id": "slot-001",
+      "roomId": "room-a",
+      "date": "2026-06-16",
+      "startTime": "09:00",
+      "endTime": "11:00",
+      "bookedBy": "张明",
+      "projectName": "城市之声播客 S3"
+    },
+    {
+      "id": "slot-002",
+      "roomId": "room-a",
+      "date": "2026-06-16",
+      "startTime": "14:00",
+      "endTime": "16:00",
+      "bookedBy": "李薇",
+      "projectName": "品牌广告配音"
+    },
+    {
+      "id": "slot-003",
+      "roomId": "room-b",
+      "date": "2026-06-16",
+      "startTime": "10:00",
+      "endTime": "12:00",
+      "bookedBy": "王浩",
+      "projectName": "有声书《长安》"
+    },
+    {
+      "id": "slot-004",
+      "roomId": "room-c",
+      "date": "2026-06-16",
+      "startTime": "09:00",
+      "endTime": "10:00",
+      "bookedBy": "陈静",
+      "projectName": "游戏角色试音"
+    },
+    {
+      "id": "slot-005",
+      "roomId": "room-a",
+      "date": "2026-06-17",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "bookedBy": "赵磊",
+      "projectName": "纪录片旁白"
+    },
+    {
+      "id": "slot-006",
+      "roomId": "room-b",
+      "date": "2026-06-17",
+      "startTime": "14:00",
+      "endTime": "17:00",
+      "bookedBy": "孙悦",
+      "projectName": "电台节目录制"
+    },
+    {
+      "id": "slot-007",
+      "roomId": "room-c",
+      "date": "2026-06-17",
+      "startTime": "15:00",
+      "endTime": "16:00",
+      "bookedBy": "周洋",
+      "projectName": "短视频配音"
+    },
+    {
+      "id": "slot-008",
+      "roomId": "room-a",
+      "date": "2026-06-18",
+      "startTime": "10:00",
+      "endTime": "11:00",
+      "bookedBy": "吴芳",
+      "projectName": "企业宣传片"
+    },
+    {
+      "id": "slot-009",
+      "roomId": "room-b",
+      "date": "2026-06-18",
+      "startTime": "09:00",
+      "endTime": "11:00",
+      "bookedBy": "郑凯",
+      "projectName": "儿童故事专辑"
+    },
+    {
+      "id": "slot-010",
+      "roomId": "room-c",
+      "date": "2026-06-18",
+      "startTime": "14:00",
+      "endTime": "16:00",
+      "bookedBy": "林娜",
+      "projectName": "外语教材朗读"
+    },
+    {
+      "id": "slot-011",
+      "roomId": "room-a",
+      "date": "2026-06-19",
+      "startTime": "14:00",
+      "endTime": "17:00",
+      "bookedBy": "黄杰",
+      "projectName": "音乐 MV 人声"
+    },
+    {
+      "id": "slot-012",
+      "roomId": "room-b",
+      "date": "2026-06-19",
+      "startTime": "10:00",
+      "endTime": "12:00",
+      "bookedBy": "何琳",
+      "projectName": "新闻播报练习"
+    },
+    {
+      "id": "slot-013",
+      "roomId": "room-c",
+      "date": "2026-06-20",
+      "startTime": "09:00",
+      "endTime": "11:00",
+      "bookedBy": "马超",
+      "projectName": "动画配音"
+    },
+    {
+      "id": "slot-014",
+      "roomId": "room-a",
+      "date": "2026-06-20",
+      "startTime": "15:00",
+      "endTime": "17:00",
+      "bookedBy": "徐敏",
+      "projectName": "访谈节目"
+    },
+    {
+      "id": "slot-015",
+      "roomId": "room-b",
+      "date": "2026-06-21",
+      "startTime": "09:00",
+      "endTime": "10:00",
+      "bookedBy": "高翔",
+      "projectName": "产品发布会旁白"
+    },
+    {
+      "id": "slot-016",
+      "roomId": "room-c",
+      "date": "2026-06-21",
+      "startTime": "14:00",
+      "endTime": "15:00",
+      "bookedBy": "罗丹",
+      "projectName": "公益广告"
+    },
+    {
+      "id": "slot-017",
+      "roomId": "room-a",
+      "date": "2026-06-22",
+      "startTime": "09:00",
+      "endTime": "11:00",
+      "bookedBy": "冯雪",
+      "projectName": "历史纪录片"
+    },
+    {
+      "id": "slot-018",
+      "roomId": "room-b",
+      "date": "2026-06-22",
+      "startTime": "14:00",
+      "endTime": "16:00",
+      "bookedBy": "邓伟",
+      "projectName": "播客对谈"
+    }
+  ]
+}
