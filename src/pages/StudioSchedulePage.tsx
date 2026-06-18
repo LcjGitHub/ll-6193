@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, LayoutGrid, Printer } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { format } from "date-fns";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { format, isValid, parseISO } from "date-fns";
 import { ApplicationDialog } from "@/components/ApplicationDialog";
 import { SearchInput } from "@/components/SearchInput";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,8 @@ import {
   formatWeekLabel,
   getMockBaseWeek,
   getWeekDays,
+  loadLocalSlots,
+  saveLocalSlots,
   subWeeks,
   toDateKey,
 } from "@/lib/schedule-utils";
@@ -44,12 +46,35 @@ const data = scheduleData as StudioScheduleData;
  */
 export function StudioSchedulePage() {
   const { rooms, slots: mockSlots } = data;
+  const [searchParams] = useSearchParams();
+  const weekParam = searchParams.get("week");
   const baseWeek = useMemo(() => getMockBaseWeek(mockSlots), [mockSlots]);
-  const [weekAnchor, setWeekAnchor] = useState(baseWeek);
+  const initialWeek = useMemo(() => {
+    if (weekParam) {
+      const parsed = parseISO(weekParam);
+      if (isValid(parsed)) {
+        return parsed;
+      }
+    }
+    return baseWeek;
+  }, [weekParam, baseWeek]);
+  const [weekAnchor, setWeekAnchor] = useState(initialWeek);
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [localSlots, setLocalSlots] = useState<ScheduleSlot[]>([]);
   const [pendingCell, setPendingCell] = useState<PendingCell | null>(null);
+
+  useEffect(() => {
+    setLocalSlots(loadLocalSlots());
+  }, []);
+
+  useEffect(() => {
+    saveLocalSlots(localSlots);
+  }, [localSlots]);
+
+  useEffect(() => {
+    document.title = "录音棚场次排期";
+  }, []);
 
   const allSlots = useMemo(() => [...mockSlots, ...localSlots], [mockSlots, localSlots]);
 

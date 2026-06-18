@@ -213,6 +213,17 @@ export function calculateWeeklyOccupancy(
   };
 }
 
+/**
+ * 将指定周次的排期数据整理为打印预览所需的结构化数据。
+ *
+ * 按天分组，每天包含所有房间在各个时段的占用情况，
+ * 每个单元格标注是否被预约、对应的项目名称、预约人及联系电话。
+ *
+ * @param slots - 所有预约记录（包括本地申请的预约）
+ * @param rooms - 所有房间列表
+ * @param weekAnchor - 目标周的锚点日期（该周内任意一天均可）
+ * @returns 结构化的打印预览数据，包含周标签、按天分组的房间时段占用表
+ */
 export function buildPrintPreviewData(
   slots: ScheduleSlot[],
   rooms: Room[],
@@ -264,4 +275,35 @@ export function buildPrintPreviewData(
     days,
     timeSlots: TIME_SLOTS,
   };
+}
+
+const LOCAL_SLOTS_KEY = "studio-schedule-local-slots";
+
+/**
+ * 从 localStorage 读取本地申请的预约记录。
+ * 如果不存在或解析失败，返回空数组。
+ */
+export function loadLocalSlots(): ScheduleSlot[] {
+  try {
+    const raw = typeof window !== "undefined" ? window.localStorage.getItem(LOCAL_SLOTS_KEY) : null;
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed as ScheduleSlot[];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * 将本地申请的预约记录保存到 localStorage。
+ */
+export function saveLocalSlots(slots: ScheduleSlot[]): void {
+  try {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(LOCAL_SLOTS_KEY, JSON.stringify(slots));
+    }
+  } catch {
+    // 忽略存储错误
+  }
 }

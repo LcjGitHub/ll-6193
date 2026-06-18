@@ -1,38 +1,67 @@
 import { ArrowLeft, Printer } from "lucide-react";
-import { parseISO } from "date-fns";
-import { useMemo } from "react";
+import { isValid, parseISO } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import scheduleData from "@/mock/studio-schedule.json";
-import type { PrintPreviewData, StudioScheduleData } from "@/types/schedule";
+import type { PrintPreviewData, ScheduleSlot, StudioScheduleData } from "@/types/schedule";
 import {
   buildPrintPreviewData,
   getMockBaseWeek,
+  loadLocalSlots,
+  toDateKey,
 } from "@/lib/schedule-utils";
 import { cn } from "@/lib/utils";
 
 const data = scheduleData as StudioScheduleData;
 
+/**
+ * 打印预览页面。
+ *
+ * 功能：
+ * - 通过 URL query 参数 `week=yyyy-MM-dd` 接收周次锚点，无效或缺失时回退到数据基准周
+ * - 将指定周次的排期（含 mock 数据 + 本地申请预约）整理为按天分组的简洁表格
+ * - 表格展示各房间在各时段的占用情况，包含项目名称、预约人、联系电话
+ * - 提供「打印」按钮触发浏览器原生打印，打印样式已优化
+ * -「返回排期页」链接携带当前周次参数，确保周次上下文不丢失
+ */
 export function PrintPreviewPage() {
-  const { rooms, slots } = data;
+  const { rooms, slots: mockSlots } = data;
   const [searchParams] = useSearchParams();
   const weekParam = searchParams.get("week");
+  const [localSlots, setLocalSlots] = useState<ScheduleSlot[]>([]);
+
+  const baseWeek = useMemo(() => getMockBaseWeek(mockSlots), [mockSlots]);
 
   const weekAnchor = useMemo(() => {
     if (weekParam) {
-      try {
-        return parseISO(weekParam);
-      } catch {
-        return getMockBaseWeek(slots);
+      const parsed = parseISO(weekParam);
+      if (isValid(parsed)) {
+        return parsed;
       }
     }
-    return getMockBaseWeek(slots);
-  }, [weekParam, slots]);
+    return baseWeek;
+  }, [weekParam, baseWeek]);
+
+  useEffect(() => {
+    setLocalSlots(loadLocalSlots());
+  }, []);
+
+  const allSlots = useMemo(
+    () => [...mockSlots, ...localSlots],
+    [mockSlots, localSlots]
+  );
 
   const previewData: PrintPreviewData = useMemo(
-    () => buildPrintPreviewData(slots, rooms, weekAnchor),
-    [slots, rooms, weekAnchor]
+    () => buildPrintPreviewData(allSlots, rooms, weekAnchor),
+    [allSlots, rooms, weekAnchor]
   );
+
+  useEffect(() => {
+    document.title = "打印预览";
+  }, []);
+
+  const weekQueryValue = toDateKey(weekAnchor);
 
   const handlePrint = () => {
     window.print();
@@ -43,7 +72,7 @@ export function PrintPreviewPage() {
       <div className="print:hidden sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
           <Link
-            to="/"
+            to={`/?week=${weekQueryValue}`}
             className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -55,7 +84,7 @@ export function PrintPreviewPage() {
             </span>
             <Button onClick={handlePrint} className="gap-2">
               <Printer className="h-4 w-4" />
-              打印预览
+              打印
             </Button>
           </div>
         </div>
